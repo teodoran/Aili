@@ -1,3 +1,6 @@
+##########################################################
+# Global variables and functions directly related to them.
+
 currentPlayer = 'X'
 board = ['_' for i in range(9)]
 done = 0
@@ -6,10 +9,23 @@ def i(x, y):
     return y*3 + x
 
 def printBoard(board):
+    print ""
     print "   0 1 2 "
     print "   _____ "
     for i in range(3):
         print "{0} |{1} {2} {3}|".format(i, board[i*3], board[i*3+1], board[i*3+2])
+    print ""
+
+def swapCurrentPlayer():
+    global currentPlayer
+    if currentPlayer == 'X':
+        currentPlayer = 'O'
+    else:
+        currentPlayer = 'X'
+
+
+#######################################################
+# Ai related functions. Includes Minimax implementation
 
 def minimax(player, board):
     if hasWon(board):
@@ -57,6 +73,22 @@ def expandChild(board, move, player):
     newBoard[move] = piece
     return newBoard
 
+
+########################################
+# Functions to determine if game is over
+
+def checkGameEnded(player, board):
+    global done
+    if hasWon(board):
+        done = 1
+        if player == 'O':
+            print "Aili has won!"
+        else:
+            print "You hvae won!"
+    if isFull(board):
+        done = 1
+        print "Game ended with a tie."
+
 def isFull(board):
     n = 0
     
@@ -80,6 +112,10 @@ def threeInRow(board, i, j, k):
     if board[i] != '_' and board[j] != '_' and board[k] != '_' and board[i] == board[j] and board[i] == board[k]:
         return 1
     return 0
+
+
+#############################################
+# Piece placement functions for player and Ai
 
 def aiMove(board):
     print "Aili makes her move."
@@ -114,21 +150,16 @@ def placePiece(player, board):
     board[move] = player
     printBoard(board)
 
-def checkGameEnded(player, board):
-    global done
-    if hasWon(board):
-        done = 1
-        print "Player {0} has won!".format(player)
-    if isFull(board):
-        done = 1
-        print "Game ended with a tie."
 
-def swapCurrentPlayer():
-    global currentPlayer
-    if currentPlayer == 'X':
-        currentPlayer = 'O'
-    else:
-        currentPlayer = 'X'
+##################################
+# Game loop and intro print-screen
+
+print " __________________________"
+print "|                          |"
+print "|       /\  |  |   |       |"
+print "|      /  \ |  |__ |       |"
+print "|                          |"
+print "|The tic tac toe playing AI|"
 
 printBoard(board)
 
