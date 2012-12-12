@@ -1,19 +1,15 @@
-currentPiece = 'O'
+currentPlayer = 'X'
 board = ['_' for i in range(9)]
 done = 0
 
-def aiMove(player, board):
-    maxMove = -1
-    maximum = -2
+def i(x, y):
+    return y*3 + x
 
-    children = getAllLegalMoves(board)
-
-    for move in children:
-        temp = minimax(-1*player, expandChild(board, move, player))
-        if temp > maximum:
-            maximum = temp
-            maxMove = move
-    return maxMove
+def printBoard(board):
+    print "   0 1 2 "
+    print "   _____ "
+    for i in range(3):
+        print "{0} |{1} {2} {3}|".format(i, board[i*3], board[i*3+1], board[i*3+2])
 
 def minimax(player, board):
     if hasWon(board):
@@ -21,7 +17,7 @@ def minimax(player, board):
     if isFull(board):
         return 0
 
-    children = getAllLegalMoves(board)
+    children = allLegalMoves(board)
 
     if player == 1:
         maximum = -2
@@ -39,19 +35,24 @@ def minimax(player, board):
                 minimum = temp
         return minimum
 
-def getAllLegalMoves(board):
+def allLegalMoves(board):
     moves = []
     for i in range(9):
         if isVacant(board, i):
             moves.append(i)
     return moves
+
+def isVacant(board, i):
+    if board[i] != '_':
+        return 0
+    return 1
         
 def expandChild(board, move, player):
-    piece = 'X'
+    piece = 'O'
     newBoard = board[:]
 
     if player == -1:
-        piece = 'O'
+        piece = 'X'
 
     newBoard[move] = piece
     return newBoard
@@ -66,7 +67,6 @@ def isFull(board):
 
 def hasWon(board):
     returnVal = 0
-
     returnVal += threeInRow(board, 0, 4, 8)
     returnVal += threeInRow(board, 2, 4, 6)
 
@@ -74,7 +74,6 @@ def hasWon(board):
         n = i*3
         returnVal += threeInRow(board, n, n+1, n+2)
         returnVal +=  threeInRow(board, i, i+3, i+6)
-
     return returnVal
 
 def threeInRow(board, i, j, k):
@@ -82,63 +81,61 @@ def threeInRow(board, i, j, k):
         return 1
     return 0
 
-def isVacant(board, i):
-    if board[i] != '_':
-        return 0
-    return 1
+def aiMove(board):
+    print "Aili makes her move."
+    maxMove = -1
+    maximum = -2
+    children = allLegalMoves(board)
 
-def swapCurrentPiece():
-    global currentPiece
-    if currentPiece == 'X':
-        currentPiece = 'O'
-    else:
-        currentPiece = 'X'
+    for move in children:
+        temp = minimax(-1, expandChild(board, move, 1))
+        if temp > maximum:
+            maximum = temp
+            maxMove = move
+    return maxMove
 
-def xyi(x, y):
-    return y*3 + x
-
-def userPlacePiece(board, currentPiece):
-    userInput = raw_input("{0}'s turn: ".format(currentPiece))
-    x = int(userInput.split(' ')[0])%3
-    y = int(userInput.split(' ')[1])%3
+def userMove(board):
+    while 1:
+        userInput = raw_input("{0}'s turn: ".format('X'))
+        x = int(userInput.split(' ')[0])%3
+        y = int(userInput.split(' ')[1])%3
     
-    if isVacant(board, xyi(x, y)):
-        board[xyi(x, y)] = currentPiece
-        printBoard(board)
-        swapCurrentPiece()
-    else:
-        print "Place is not vacant."
+        if i(x, y) in allLegalMoves(board):
+            return i(x, y)
+        else:
+            print "Place is not vacant."
 
-def aiPlacePiece(board):
-    move = aiMove(1, board)
-    board[move] = currentPiece
+def placePiece(player, board):
+    move = 0
+    if player == 'O':
+        move = aiMove(board)
+    else:
+        move = userMove(board)
+    board[move] = player
     printBoard(board)
-    swapCurrentPiece()
-    
 
-def checkGameEnded():
+def checkGameEnded(player, board):
+    global done
     if hasWon(board):
         done = 1
-        swapCurrentPiece()
-        print "Player {0} has won!".format(currentPiece)
+        print "Player {0} has won!".format(player)
     if isFull(board):
         done = 1
         print "Game ended with a tie."
 
-def printBoard(board):
-    print "   0 1 2 "
-    print "   _____ "
-    print "0 |{0} {1} {2}|".format(board[0], board[1], board[2])
-    print "1 |{0} {1} {2}|".format(board[3], board[4], board[5])
-    print "2 |{0} {1} {2}|".format(board[6], board[7], board[8])
+def swapCurrentPlayer():
+    global currentPlayer
+    if currentPlayer == 'X':
+        currentPlayer = 'O'
+    else:
+        currentPlayer = 'X'
 
 printBoard(board)
 
 while not done:
-    userPlacePiece(board, currentPiece)
-    checkGameEnded()
-    aiPlacePiece(board)
-    checkGameEnded()
+    placePiece(currentPlayer, board)
+    checkGameEnded(currentPlayer, board)
+    swapCurrentPlayer()
     
  
     
