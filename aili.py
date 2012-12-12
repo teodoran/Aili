@@ -1,26 +1,23 @@
-currentPiece = 'X'
+currentPiece = 'O'
 board = ['_' for i in range(9)]
 done = 0
 
-def minimax(player, board):
+def aiMove(player, board):
     maxMove = -1
     maximum = -2
 
     children = getAllLegalMoves(board)
 
     for move in children:
-        temp = minimax_iteration(-1*player, expandChild(board, move, player))
+        temp = minimax(-1*player, expandChild(board, move, player))
         if temp > maximum:
             maximum = temp
             maxMove = move
-
     return maxMove
 
-def minimax_iteration(player, board):
-    printBoard(board)
-    
+def minimax(player, board):
     if hasWon(board):
-        return player*1
+        return player*-1
     if isFull(board):
         return 0
 
@@ -34,15 +31,13 @@ def minimax_iteration(player, board):
                 maximum = temp
         return maximum
 
-    if player == -1:
+    else:
         minimum = 2
         for move in children:
             temp = minimax(-1*player, expandChild(board, move, player))
             if temp < minimum:
                 minimum = temp
         return minimum
-            
-    return 0
 
 def getAllLegalMoves(board):
     moves = []
@@ -53,12 +48,13 @@ def getAllLegalMoves(board):
         
 def expandChild(board, move, player):
     piece = 'X'
+    newBoard = board[:]
 
     if player == -1:
         piece = 'O'
 
-    board[move] = piece
-    return board
+    newBoard[move] = piece
+    return newBoard
 
 def isFull(board):
     n = 0
@@ -113,6 +109,22 @@ def userPlacePiece(board, currentPiece):
     else:
         print "Place is not vacant."
 
+def aiPlacePiece(board):
+    move = aiMove(1, board)
+    board[move] = currentPiece
+    printBoard(board)
+    swapCurrentPiece()
+    
+
+def checkGameEnded():
+    if hasWon(board):
+        done = 1
+        swapCurrentPiece()
+        print "Player {0} has won!".format(currentPiece)
+    if isFull(board):
+        done = 1
+        print "Game ended with a tie."
+
 def printBoard(board):
     print "   0 1 2 "
     print "   _____ "
@@ -122,15 +134,11 @@ def printBoard(board):
 
 printBoard(board)
 
-minimax(1, board)
-
-#while not done:
-#    userPlacePiece(board, currentPiece)
-#    if hasWon(board):
-#        done = 1
-#        swapCurrentPiece()
-#        print "Player {0} has won!".format(currentPiece)
-#    if isFull(board):
-#        done = 1
-#        print "Game ended with a tie."
+while not done:
+    userPlacePiece(board, currentPiece)
+    checkGameEnded()
+    aiPlacePiece(board)
+    checkGameEnded()
+    
+ 
     
