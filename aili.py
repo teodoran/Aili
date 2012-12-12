@@ -1,6 +1,16 @@
 currentPiece = 'X'
 board = ['_' for i in range(9)]
+tboard = ['X' for i in range(9)]
 done = 0
+
+def isFull(board):
+    n = 0
+    
+    for i in range(3):
+        for j in range(3):
+            n += not isVacant(board, i, j)
+
+    return n >= 9
 
 def hasWon(board):
     returnVal = 0
@@ -59,10 +69,15 @@ def printBoard(board):
 
 printBoard(board)
 
+print isFull(tboard)
+
 while not done:
     userPlacePiece(board, currentPiece)
     if hasWon(board):
         done = 1
         swapCurrentPiece()
         print "Player {0} has won!".format(currentPiece)
+    if isFull(board):
+        done = 1
+        print "Game ended with a tie."
     
