@@ -1,14 +1,70 @@
 currentPiece = 'X'
 board = ['_' for i in range(9)]
-tboard = ['X' for i in range(9)]
 done = 0
+
+def minimax(player, board):
+    maxMove = -1
+    maximum = -2
+
+    children = getAllLegalMoves(board)
+
+    for move in children:
+        temp = minimax_iteration(-1*player, expandChild(board, move, player))
+        if temp > maximum:
+            maximum = temp
+            maxMove = move
+
+    return maxMove
+
+def minimax_iteration(player, board):
+    printBoard(board)
+    
+    if hasWon(board):
+        return player*1
+    if isFull(board):
+        return 0
+
+    children = getAllLegalMoves(board)
+
+    if player == 1:
+        maximum = -2
+        for move in children:
+            temp = minimax(-1*player, expandChild(board, move, player))
+            if temp > maximum:
+                maximum = temp
+        return maximum
+
+    if player == -1:
+        minimum = 2
+        for move in children:
+            temp = minimax(-1*player, expandChild(board, move, player))
+            if temp < minimum:
+                minimum = temp
+        return minimum
+            
+    return 0
+
+def getAllLegalMoves(board):
+    moves = []
+    for i in range(9):
+        if isVacant(board, i):
+            moves.append(i)
+    return moves
+        
+def expandChild(board, move, player):
+    piece = 'X'
+
+    if player == -1:
+        piece = 'O'
+
+    board[move] = piece
+    return board
 
 def isFull(board):
     n = 0
     
-    for i in range(3):
-        for j in range(3):
-            n += not isVacant(board, i, j)
+    for i in range(9):
+        n += not isVacant(board, i)
 
     return n >= 9
 
@@ -30,8 +86,8 @@ def threeInRow(board, i, j, k):
         return 1
     return 0
 
-def isVacant(board, x, y):
-    if board[xyi(x, y)] != '_':
+def isVacant(board, i):
+    if board[i] != '_':
         return 0
     return 1
 
@@ -45,16 +101,13 @@ def swapCurrentPiece():
 def xyi(x, y):
     return y*3 + x
 
-def placePiece(board, piece, x, y):
-    board[xyi(x, y)] = piece
-
 def userPlacePiece(board, currentPiece):
     userInput = raw_input("{0}'s turn: ".format(currentPiece))
     x = int(userInput.split(' ')[0])%3
     y = int(userInput.split(' ')[1])%3
     
-    if isVacant(board, x, y):
-        placePiece(board, currentPiece, x, y)
+    if isVacant(board, xyi(x, y)):
+        board[xyi(x, y)] = currentPiece
         printBoard(board)
         swapCurrentPiece()
     else:
@@ -69,15 +122,15 @@ def printBoard(board):
 
 printBoard(board)
 
-print isFull(tboard)
+minimax(1, board)
 
-while not done:
-    userPlacePiece(board, currentPiece)
-    if hasWon(board):
-        done = 1
-        swapCurrentPiece()
-        print "Player {0} has won!".format(currentPiece)
-    if isFull(board):
-        done = 1
-        print "Game ended with a tie."
+#while not done:
+#    userPlacePiece(board, currentPiece)
+#    if hasWon(board):
+#        done = 1
+#        swapCurrentPiece()
+#        print "Player {0} has won!".format(currentPiece)
+#    if isFull(board):
+#        done = 1
+#        print "Game ended with a tie."
     
