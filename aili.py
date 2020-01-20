@@ -64,11 +64,11 @@ def isVacant(board, i):
     return 1
         
 def expandChild(board, move, player):
-    piece = 'O'
+    piece = 'X'
     newBoard = board[:]
 
     if player == -1:
-        piece = 'X'
+        piece = 'O'
 
     newBoard[move] = piece
     return newBoard
@@ -81,7 +81,7 @@ def checkGameEnded(player, board):
     global done
     if hasWon(board):
         done = 1
-        if player == 'O':
+        if player == 'X':
             print "Aili has won!"
         else:
             print "You hvae won!"
@@ -132,7 +132,7 @@ def aiMove(board):
 
 def userMove(board):
     while 1:
-        userInput = raw_input("{0}'s turn: ".format('X'))
+        userInput = raw_input("{0}'s turn: ".format('O'))
         x = int(userInput.split(' ')[0])%3
         y = int(userInput.split(' ')[1])%3
     
@@ -143,7 +143,7 @@ def userMove(board):
 
 def placePiece(player, board):
     move = 0
-    if player == 'O':
+    if player == 'X':
         move = aiMove(board)
     else:
         move = userMove(board)
